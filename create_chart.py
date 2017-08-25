@@ -5,8 +5,6 @@ import pandas as pd
 
 from collect_settings import open_gui
 
-# Future: Should x axis be something other than numThreads?
-# Add other dimensions to be compared at the same time
 # Save settings to a file and enable reloading of a setting from that file (last 20?)
 
 def exec_cmd(cmd):
@@ -20,9 +18,9 @@ def load_and_run(dictionary):
         for storage_engine in dictionary['storage_engines']:
             exec_cmd('pgrep mongod | xargs kill')
             print 'just killed existing mongod processes'
-            # 'killall -w mongod'
+            # 'killall -w mongod' on Linux
             try:
-                # Suggestion: Have the user input a config file to setup mongod
+                # Future work: Have the user input a config file to setup mongod
                 exec_cmd('./bin/mongod-{} --fork --syslog --storageEngine={}'.format(mongod, storage_engine))
             except CalledProcessError as err:
                 print err
@@ -54,6 +52,7 @@ def parse_throughputs(dictionary):
     return dictionary
 
 def create_bar_chart(dictionary):
+    '''Defunct function that had worked for POC'''
     groups = len(dictionary['groups'])
     v1_data = dictionary['group_results'][0]
     v2_data = dictionary['group_results'][1]
@@ -78,34 +77,28 @@ def create_bar_chart(dictionary):
     plt.show()
 
 def create_bubble_chart():
+    # for each group, y = [], s = []
+    # create df and add as an axis
 
-    #example data frame
-    x = [5, 10, 20, 30, 5, 10, 20, 30, 5, 10, 20, 30]
-    y = [100, 100, 200, 200, 300, 300, 400, 400, 500, 500, 600, 600]
-    s = [5, 10, 20, 30, 5, 10, 20, 30, 5, 10, 20, 30]
-    users = ['mark', 'mark', 'mark', 'rachel', 'rachel', 'rachel', 'jeff',
-             'jeff', 'jeff', 'lauren', 'lauren', 'lauren']
+    x = [2, 4, 6, 8, 10]
+    y = [2000, 2500, 3000, 3500, 3800]
+    s = [25, 1, 50, 25, 25]
 
-    # df = pd.DataFrame(dict(x=x, y=y, users=users)
+    b = [1000, 2300, 3200, 3600, 5000]
+    c = [30, 2, 93, 25, 25]
 
-    # # ax = df.plot.scatter(x='x', y='y', s=s, alpha=0.5)
-    # # ax = df.plot.scatter(x='x', y='y', alpha=0.5)
+    df = pd.DataFrame(dict(x=x, y=y, s=s, b=b, c=c), columns=['x', 'y', 's', 'b', 'c'])
+    ax = df.plot(kind='scatter', x='x', y='b', s=df['c']*20, color='DarkGreen', label='Group 1', alpha=0.5)
+    # print(dict(x=x, y=y, s=s))
+    df.plot(kind='scatter', x='x', y='y', s=df['s']*20, color='DarkBlue', label='Group 2', ax=ax, alpha=0.5)
 
-    df = pd.DataFrame(dict(x=x, y=y, s=s, users=users))
-
-    fig, ax = plt.subplots(facecolor='w')
-
-    for key, row in df.iterrows():
-        ax.scatter(row['x'], row['y'], s=row['s']*5, alpha=.5)
-        ax.annotate(row['users'], xy=(row['x'], row['y']))
-
-    # for i, txt in enumerate(df.users):
-    #     ax.annotate(txt, (df.x.iat[i],df.y.iat[i]))
     plt.show()
 
 if __name__ == "__main__":
     dictionary = open_gui()
-    print 'executing workload files...'
-    load_and_run(dictionary)
-    print 'finished loading / running workload files'
-    create_bar_chart(parse_throughputs(dictionary))
+    print(dictionary)
+    # print 'executing workload files...'
+    # load_and_run(dictionary)
+    # print 'finished loading / running workload files'
+    # create_bar_chart(parse_throughputs(dictionary))
+    # create_bubble_chart()
