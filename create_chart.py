@@ -14,8 +14,10 @@ def exec_cmd(cmd):
 def load_and_run(dictionary):
     '''Load and run workload files'''
     # Start mongod
+    mongod_se = []
     for mongod in dictionary['mongod_versions']:
         for storage_engine in dictionary['storage_engines']:
+            mongod_se.append('{} {}'.format(mongod, storage_engine))
             exec_cmd('pgrep mongod | xargs kill')
             print 'just killed existing mongod processes'
             # 'killall -w mongod' on Linux
@@ -34,6 +36,9 @@ def load_and_run(dictionary):
             print 'done, going to kill this mongod'
             exec_cmd('pgrep mongod | xargs kill')
 
+        # Need to call parse_throughputs here actually...
+    dictionary['mongod_se'] = mongod_se
+
 def parse_throughputs(dictionary):
     '''Save throughput numbers from .out files and return modified dictionary'''
     group_results = []
@@ -49,6 +54,9 @@ def parse_throughputs(dictionary):
         group_results.append(group_throughputs)
     dictionary['group_results'] = group_results
     print dictionary
+
+
+
     return dictionary
 
 def create_bar_chart(dictionary):
@@ -78,7 +86,8 @@ def create_bar_chart(dictionary):
 
 def create_bubble_chart():
     # for each group, y = [], s = []
-    # create df and add as an axis
+    x_axis = result_object['threads']
+
 
     x = [2, 4, 6, 8, 10]
     y = [2000, 2500, 3000, 3500, 3800]
@@ -87,7 +96,7 @@ def create_bubble_chart():
     b = [1000, 2300, 3200, 3600, 5000]
     c = [30, 2, 93, 25, 25]
 
-    df = pd.DataFrame(dict(x=x, y=y, s=s, b=b, c=c), columns=['x', 'y', 's', 'b', 'c'])
+    df = pd.DataFrame(dict(x=x_axis, y=y, s=s, b=b, c=c), columns=['# threads', 'y', 's', 'b', 'c'])
     ax = df.plot(kind='scatter', x='x', y='b', s=df['c']*20, color='DarkGreen', label='Group 1', alpha=0.5)
     # print(dict(x=x, y=y, s=s))
     df.plot(kind='scatter', x='x', y='y', s=df['s']*20, color='DarkBlue', label='Group 2', ax=ax, alpha=0.5)

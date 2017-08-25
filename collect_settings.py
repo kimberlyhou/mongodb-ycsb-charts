@@ -1,7 +1,7 @@
 from appJar import gui
 
-'''Show GUI to user'''
 def open_gui():
+    '''Show GUI to user'''
     result_object = {}
   
     def start_gui():
@@ -14,6 +14,7 @@ def open_gui():
         app.go()
 
     def specify_dim_comparisons(btn):
+        '''Second step'''
         app.removeButton('Next')
         app.disableOptionBox('dimensions')
         app.disableOptionBox('dimension_comparisons')
@@ -65,6 +66,7 @@ def open_gui():
         app.addButton('Next', choose_num_trials)
 
     def choose_num_trials(btn):
+        '''Choose # groups and # threads per group'''
         app.removeButton('Next')
         app.addLabel('label_num_trials', \
              'How many groups would you like to compare? \
@@ -83,6 +85,7 @@ def open_gui():
         showRemainingOptions()
 
     def showRemainingOptions():
+        '''Remaining options are fixed'''
         app.addLabelNumericEntry('Field Count')
         app.setEntryDefault('Field Count', 50)
         app.addLabelNumericEntry('Field Length')
@@ -96,6 +99,7 @@ def open_gui():
         app.addButton('Run', validate_before_write)
 
     def check_proportions(num_dimensions):
+        '''Validate and add ratios to global var result_object'''
         workload_ratios = []
         for i in range(num_dimensions):
             read = app.getEntry('Read Proportion #{}'.format(i))
@@ -146,6 +150,7 @@ def open_gui():
         result_object['chosen_dimension'] = chosen_dimension
         workload_files = []
         workload_labels = []
+        workload_ranges = []
         if chosen_dimension == 'Workload ratio':
             for t in range(num_trials):
                 for d in range(num_dimensions):
@@ -154,6 +159,8 @@ def open_gui():
                     scan = result_object['workload_ratios'][d]['scan']
                     insert = result_object['workload_ratios'][d]['insert']
                     workload_labels.append('RUSI: {}-{}-{}-{}'.format(read, update, scan, insert))
+                    absolute_range = abs(abs(abs(int(read * 100) - int(update * 100)) - int(scan * 100)) - int(insert * 100))
+                    workload_ranges.append(absolute_range)
 
                     filename = 'fc{}fl{}rc{}-r{}u{}s{}i{}-t{}'.format(field_count, 
                         field_length, record_count, int(read * 100), int(update * 100), 
