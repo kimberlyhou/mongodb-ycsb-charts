@@ -45,27 +45,9 @@ def load_and_run(dictionary):
             print 'done, going to kill this mongod'
             exec_cmd('pgrep mongod | xargs kill')
 
-        # Need to call parse_throughputs here actually...
     dictionary['mongod_se'] = mongod_se
     dictionary['throughputs'] = throughputs
     print(dictionary)
-
-# def parse_throughputs(dictionary):
-#     '''Save throughput numbers from .out files and return modified dictionary'''
-#     group_results = []
-#     for group in dictionary['groups']:
-#         group_throughputs = []
-#         for workload_file in group:
-#             file = open(workload_file + '.out')
-#             line = file.readline()
-#             while 'Throughput' not in line:
-#                 line = file.readline()
-#             line = line.split()
-#             group_throughputs.append(float(line[-1]))
-#         group_results.append(group_throughputs)
-#     dictionary['group_results'] = group_results
-#     print dictionary
-#     return dictionary
 
 def parse_throughput(workload_file, throughput_arr):
     file = open(workload_file + '.out')
@@ -121,7 +103,7 @@ def create_bubble_chart():
 
 if __name__ == "__main__":
     # dictionary = open_gui()
-    dictionary = {'workload_files': ['fc20fl10rc200000-r95u5s0i0-t1', 'fc20fl10rc200000-r5u95s0i0-t1', 'fc20fl10rc200000-r95u5s0i0-t3', 'fc20fl10rc200000-r5u95s0i0-t3'], 'workload_ratios': [{'read': 0.95, 'insert': 0.0, 'update': 0.05, 'scan': 0.0}, {'read': 0.05, 'insert': 0.0, 'update': 0.95, 'scan': 0.0}], 'storage_engines': ['wiredTiger'], 'chosen_dimension': 'Workload ratio', 'threads': ['1', '3'], 'workload_labels': ['RUSI: 0.95-0.05-0.0-0.0', 'RUSI: 0.05-0.95-0.0-0.0', 'RUSI: 0.95-0.05-0.0-0.0', 'RUSI: 0.05-0.95-0.0-0.0'], 'mongod_versions': ['3.4.7']}
+    dictionary = {'workload_files': ['fc50fl10rc200000-r95u5s0i0-t1', 'fc50fl10rc200000-r50u50s0i0-t1', 'fc50fl10rc200000-r95u5s0i0-t3', 'fc50fl10rc200000-r50u50s0i0-t3'], 'workload_ratios': [{'read': 0.95, 'insert': 0.0, 'update': 0.05, 'scan': 0.0}, {'read': 0.5, 'insert': 0.0, 'update': 0.5, 'scan': 0.0}], 'storage_engines': ['wiredTiger'], 'threads': ['1', '3'], 'workload_labels': ['RUSI: 0.95-0.05-0.0-0.0', 'RUSI: 0.5-0.5-0.0-0.0', 'RUSI: 0.95-0.05-0.0-0.0', 'RUSI: 0.5-0.5-0.0-0.0'], 'mongod_versions': ['3.4.7', '3.5.10']}
     print(dictionary)
     # print 'executing workload files...'
     load_and_run(dictionary)
