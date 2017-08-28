@@ -1,4 +1,6 @@
 from subprocess import check_output, CalledProcessError, STDOUT
+import matplotlib
+matplotlib.use('TkAgg')
 from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
@@ -15,8 +17,12 @@ def load_and_run(dictionary):
     '''Load and run workload files'''
     # Start mongod
     mongod_se = []
+    # For every element in mongod_se, there is a list element in throughputs.
+    throughputs = []
     for mongod in dictionary['mongod_versions']:
+        print 'mongod is {}'.format(mongod)
         for storage_engine in dictionary['storage_engines']:
+            print 'storage_engine is {}'.format(storage_engine)
             mongod_se.append('{} {}'.format(mongod, storage_engine))
             exec_cmd('pgrep mongod | xargs kill')
             print 'just killed existing mongod processes'
@@ -27,37 +33,47 @@ def load_and_run(dictionary):
             except CalledProcessError as err:
                 print err
                 print err.output
+            group_throughputs = []
             for workload_file in dictionary['workload_files']:
                 exec_cmd('./bin/ycsb load mongodb -s -P {}'.format(workload_file))
                 print 'loaded {}'.format(workload_file)
                 exec_cmd('./bin/ycsb run mongodb -s -P {}'.format(workload_file))
                 print 'ran {}'.format(workload_file)
-
+                parse_throughput(workload_file, group_throughputs)
+            print group_throughputs
+            throughputs.append(group_throughputs)
             print 'done, going to kill this mongod'
             exec_cmd('pgrep mongod | xargs kill')
 
         # Need to call parse_throughputs here actually...
     dictionary['mongod_se'] = mongod_se
+    dictionary['throughputs'] = throughputs
+    print(dictionary)
 
-def parse_throughputs(dictionary):
-    '''Save throughput numbers from .out files and return modified dictionary'''
-    group_results = []
-    for group in dictionary['groups']:
-        group_throughputs = []
-        for workload_file in group:
-            file = open(workload_file + '.out')
-            line = file.readline()
-            while 'Throughput' not in line:
-                line = file.readline()
-            line = line.split()
-            group_throughputs.append(float(line[-1]))
-        group_results.append(group_throughputs)
-    dictionary['group_results'] = group_results
-    print dictionary
+# def parse_throughputs(dictionary):
+#     '''Save throughput numbers from .out files and return modified dictionary'''
+#     group_results = []
+#     for group in dictionary['groups']:
+#         group_throughputs = []
+#         for workload_file in group:
+#             file = open(workload_file + '.out')
+#             line = file.readline()
+#             while 'Throughput' not in line:
+#                 line = file.readline()
+#             line = line.split()
+#             group_throughputs.append(float(line[-1]))
+#         group_results.append(group_throughputs)
+#     dictionary['group_results'] = group_results
+#     print dictionary
+#     return dictionary
 
-
-
-    return dictionary
+def parse_throughput(workload_file, throughput_arr):
+    file = open(workload_file + '.out')
+    line = file.readline()
+    while 'Throughput' not in line:
+        line = file.readline()
+    line = line.split()
+    throughput_arr.append(float(line[-1]))
 
 def create_bar_chart(dictionary):
     '''Defunct function that had worked for POC'''
@@ -104,10 +120,11 @@ def create_bubble_chart():
     plt.show()
 
 if __name__ == "__main__":
-    dictionary = open_gui()
+    # dictionary = open_gui()
+    dictionary = {'workload_files': ['fc20fl10rc200000-r95u5s0i0-t1', 'fc20fl10rc200000-r5u95s0i0-t1', 'fc20fl10rc200000-r95u5s0i0-t3', 'fc20fl10rc200000-r5u95s0i0-t3'], 'workload_ratios': [{'read': 0.95, 'insert': 0.0, 'update': 0.05, 'scan': 0.0}, {'read': 0.05, 'insert': 0.0, 'update': 0.95, 'scan': 0.0}], 'storage_engines': ['wiredTiger'], 'chosen_dimension': 'Workload ratio', 'threads': ['1', '3'], 'workload_labels': ['RUSI: 0.95-0.05-0.0-0.0', 'RUSI: 0.05-0.95-0.0-0.0', 'RUSI: 0.95-0.05-0.0-0.0', 'RUSI: 0.05-0.95-0.0-0.0'], 'mongod_versions': ['3.4.7']}
     print(dictionary)
     # print 'executing workload files...'
-    # load_and_run(dictionary)
+    load_and_run(dictionary)
     # print 'finished loading / running workload files'
     # create_bar_chart(parse_throughputs(dictionary))
-    # create_bubble_chart()
+    #create_bubble_chart()
