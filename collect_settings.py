@@ -141,6 +141,7 @@ def open_gui():
         workload_ranges = []
 
         for t in range(num_trials):
+            files_threadgroup = []
             for d in range(num_dimensions):
                 read = result_object['workload_ratios'][d]['read']
                 update = result_object['workload_ratios'][d]['update']
@@ -170,13 +171,15 @@ def open_gui():
                 file.write('insertproportion={}\n\n'.format(insert))
                 file.write('requestdistribution=zipfian\n')
                 file.close()
-                workload_files.append(filename)
+                files_threadgroup.append(filename)
                 print(filename + ' has been saved.')
+            workload_files.append(files_threadgroup)
 
         result_object['storage_engines'] = storage_engines
         result_object['mongod_versions'] = mongods
-        result_object['workload_labels'] = workload_labels
         result_object['workload_files'] = workload_files
+        result_object['workload_labels'] = workload_labels
+        result_object['workload_ranges'] = workload_ranges
         result_object['threads'] = threads
         app.stop()
 
