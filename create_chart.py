@@ -188,11 +188,11 @@ def create_bubble_chart(dictionary):
     plt.show()
 
 if __name__ == "__main__":
-    #dictionary = open_gui()
-    #print(dictionary)
-    # print 'executing workload files...'
-    #load_and_run(dictionary)
-    # print 'finished loading / running workload files'
+    dictionary = open_gui()
+    print(dictionary)
+    print 'executing workload files...'
+    load_and_run(dictionary)
+    print 'finished loading / running workload files'
     # create_bar_chart(parse_throughputs(dictionary))
-    dictionary = {'workload_files': [['fc20fl10rc20000-r95u5s0i0-t2', 'fc20fl10rc20000-r50u50s0i0-t2'], ['fc20fl10rc20000-r95u5s0i0-t4', 'fc20fl10rc20000-r50u50s0i0-t4']], 'throughputs': {'3.4.7': {'wiredTiger': {'2': [4161.464835622139, 3619.254433586681], '4': [5678.591709256105, 4640.371229698376]}}, '3.5.10': {'wiredTiger': {'2': [4420.866489832007, 3463.8032559750604], '4': [5583.472920156337, 4593.477262287552]}}}, 'workload_ratios': [{'read': 0.95, 'insert': 0.0, 'update': 0.05, 'scan': 0.0}, {'read': 0.5, 'insert': 0.0, 'update': 0.5, 'scan': 0.0}], 'storage_engines': ['wiredTiger'], 'workload_ranges': [90, 0, 90, 0], 'mongod_se': ['3.4.7 wiredTiger', '3.5.10 wiredTiger'], 'threads': ['2', '4'], 'workload_labels': ['RUSI: 0.95-0.05-0.0-0.0', 'RUSI: 0.5-0.5-0.0-0.0', 'RUSI: 0.95-0.05-0.0-0.0', 'RUSI: 0.5-0.5-0.0-0.0'], 'mongod_versions': ['3.4.7', '3.5.10']}
+    #dictionary = {'workload_files': [['fc20fl10rc20000-r95u5s0i0-t2', 'fc20fl10rc20000-r50u50s0i0-t2'], ['fc20fl10rc20000-r95u5s0i0-t4', 'fc20fl10rc20000-r50u50s0i0-t4']], 'throughputs': {'3.4.7': {'wiredTiger': {'2': [4161.464835622139, 3619.254433586681], '4': [5678.591709256105, 4640.371229698376]}}, '3.5.10': {'wiredTiger': {'2': [4420.866489832007, 3463.8032559750604], '4': [5583.472920156337, 4593.477262287552]}}}, 'workload_ratios': [{'read': 0.95, 'insert': 0.0, 'update': 0.05, 'scan': 0.0}, {'read': 0.5, 'insert': 0.0, 'update': 0.5, 'scan': 0.0}], 'storage_engines': ['wiredTiger'], 'workload_ranges': [90, 0, 90, 0], 'mongod_se': ['3.4.7 wiredTiger', '3.5.10 wiredTiger'], 'threads': ['2', '4'], 'workload_labels': ['RUSI: 0.95-0.05-0.0-0.0', 'RUSI: 0.5-0.5-0.0-0.0', 'RUSI: 0.95-0.05-0.0-0.0', 'RUSI: 0.5-0.5-0.0-0.0'], 'mongod_versions': ['3.4.7', '3.5.10']}
     create_bubble_chart(dictionary)
