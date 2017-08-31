@@ -24,7 +24,7 @@ def open_gui():
         app.disableOptionBox('dimension_comparisons')
         num_dimensions = int(app.getOptionBox('dimension_comparisons'))
 
-        # Ensure the labeled mongod binary is in the bin/ directory of this repo.      
+        # Ensure the labeled mongod binary is in the bin/ directory of this repo.
         for i in range(num_dimensions):
             app.addLabelNumericEntry('Read Proportion #{}'.format(i))
             app.addLabelNumericEntry('Update Proportion #{}'.format(i))
@@ -124,7 +124,7 @@ def open_gui():
     def validate_before_write(btn):
         '''When the run button is pressed, validate before writing'''
         app.disableButton('Run')
-        num_trials = int(app.getOptionBox('num_trials')) 
+        num_trials = int(app.getOptionBox('num_trials'))
         num_dimensions = int(app.getOptionBox('dimension_comparisons'))
         check_threads = validate_threads_input(num_trials)
         check_se = check_properties('Storage engines')

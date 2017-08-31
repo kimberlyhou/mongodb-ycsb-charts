@@ -8,6 +8,7 @@ matplotlib.use('TkAgg')
 from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
+import sys
 
 from collect_settings import open_gui
 
@@ -20,6 +21,10 @@ def load_and_run(dictionary):
     # Start mongod
     mongod_se = []
     throughputs = {}
+    # To prevent starting a mongod on the same port before the previous mongod fully stopped,
+    # a temporarily solution is to start each mongod on different ports to prevent an 
+    # errno 48 upon failed --fork.
+    port = 27018
     for mongod in dictionary['mongod_versions']:
         print 'mongod is {}'.format(mongod)
         throughputs[mongod] = {}
@@ -32,11 +37,12 @@ def load_and_run(dictionary):
             # 'killall -w mongod' on Linux
             try:
                 # Future work: Have the user input a config file to setup mongod
-                exec_cmd('./bin/mongod-{} --fork --syslog --storageEngine={}'.format(mongod, \
-                         storage_engine))
+                exec_cmd('./bin/mongod-{} --fork --logpath /dev/null --dbpath data/{} --port {} --storageEngine {}'.format(\
+                         mongod, storage_engine, port, storage_engine))
             except CalledProcessError as err:
                 print err
                 print err.output
+                sys.exit(1)
 
             # initialize empty dictionaries
             for thread in dictionary['threads']:
@@ -47,14 +53,15 @@ def load_and_run(dictionary):
                 throughputs[mongod][storage_engine][threadgroup] = []
                 for workload_file in dictionary['workload_files'][workload_file_group]:
                     print 'loading {}...'.format(workload_file)
-                    exec_cmd('./bin/ycsb load mongodb -s -P {}'.format(workload_file))
+                    exec_cmd('./bin/ycsb load mongodb -s -P {} -p mongodb.url=localhost:{}'.format(workload_file, port))
                     print 'running {}...'.format(workload_file)
-                    exec_cmd('./bin/ycsb run mongodb -s -P {}'.format(workload_file))
+                    exec_cmd('./bin/ycsb run mongodb -s -P {} -p mongodb.url=localhost:{}'.format(workload_file, port))
                     result = parse_throughput(workload_file)
                     throughputs[mongod][storage_engine][threadgroup].append(result)
 
             print 'done, going to kill this mongod'
             exec_cmd('pgrep mongod | xargs kill')
+            port += 1
 
     dictionary['mongod_se'] = mongod_se
     dictionary['throughputs'] = throughputs
@@ -81,7 +88,9 @@ def ratios_to_label(dictionary, index, label):
 
 def choose_color(index):
     '''Cycle through an array of colors'''
-    colors = ['#7e1e9c', '#15b01a', '#0343dataframe', '#e50000', '#029386', '#c20078', '#75bbfd']
+    colors = ['#7e1e9c', '#15b01a', '#0343df', '#e50000', '#029386', '#c20078', '#75bbfd',
+              '#06470c', '#9a0eea', '#840000', '#b9a281', '#040273', '#fc5a50', '#5170d7',
+              '#1fa774']
     if index < len(colors):
         return colors[index]
     else:
@@ -127,17 +136,18 @@ def create_bubble_chart(dictionary):
         else:
             dataframe.plot(kind='scatter', x='x', y='{}.y'.format(tuple_index), \
                  s=(dataframe['{}.s'.format(tuple_index)]+2)*15, color=choose_color(tuple_index), \
-                 label=labels[tuple_index], axes=axes, alpha=0.5)
+                 label=labels[tuple_index], ax=axes, alpha=0.5)
 
     axes.set_xlabel("# threads")
     axes.set_ylabel("Throughput (ops / sec)")
-    plt.legend(loc='center left', bbox_to_anchor=(0, 1))
+    plt.legend(loc='center left', bbox_to_anchor=(0.25, 0.75))
     plt.show()
 
 if __name__ == "__main__":
-    data = open_gui()
-    print 'executing workload files...'
-    load_and_run(data)
-    print data
-    print 'finished loading / running workload files'
+    #data = open_gui()
+    #print 'executing workload files...'
+    #load_and_run(data)
+    #print data
+    #print 'finished loading / running workload files'
+    data = {'workload_files': [['fc20fl10rc1000000-r95u5s0i0-t8', 'fc20fl10rc1000000-r50u50s0i0-t8'], ['fc20fl10rc1000000-r95u5s0i0-t16', 'fc20fl10rc1000000-r50u50s0i0-t16']], 'throughputs': {'3.4.7': {'wiredTiger': {'8': [12384.667781286767, 7670.476336580502], '16': [12424.984158145198, 7088.377895602371]}, 'mmapv1': {'8': [11374.105710938478, 4916.71091706492], '16': [10322.474090590033, 4461.119116341525]}}, '3.5.10': {'wiredTiger': {'8': [11287.191295318073, 6843.268618823095], '16': [11101.859561476547, 7489.6268667894965]}, 'mmapv1': {'8': [11427.134874472924, 5508.64030231418], '16': [12040.794210786144, 5676.270917058329]}}}, 'workload_ratios': [{'read': 0.95, 'insert': 0.0, 'update': 0.05, 'scan': 0.0}, {'read': 0.5, 'insert': 0.0, 'update': 0.5, 'scan': 0.0}], 'storage_engines': ['mmapv1', 'wiredTiger'], 'workload_ranges': [90, 0, 90, 0], 'mongod_se': ['3.4.7 mmapv1', '3.4.7 wiredTiger', '3.5.10 mmapv1', '3.5.10 wiredTiger'], 'threads': ['8', '16'], 'workload_labels': ['RUSI: 0.95-0.05-0.0-0.0', 'RUSI: 0.5-0.5-0.0-0.0', 'RUSI: 0.95-0.05-0.0-0.0', 'RUSI: 0.5-0.5-0.0-0.0'], 'mongod_versions': ['3.4.7', '3.5.10']}
     create_bubble_chart(data)
