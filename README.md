@@ -13,7 +13,8 @@ Through a GUI, the script takes in several settings for running YCSB, how many t
 
 This program has been tested on Mac OSX 10.12.
 
-An example run is as follows:
+An example run is as follows:  
+
 ![Collecting Options](https://raw.githubusercontent.com/kimberlyhou/mongodb-ycsb-charts/master/images/options_screenshot.png)
    
 After executing all workload files, the program prints out a dictionary of the data with settings and the exact numeric throughputs organized by thread group:
