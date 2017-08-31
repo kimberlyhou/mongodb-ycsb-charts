@@ -14,7 +14,15 @@ Through a GUI, the script takes in several settings for running YCSB, how many t
 This program has been tested on Mac OSX 10.12.
 
 An example run is as follows:
+![Collecting Options](https://raw.githubusercontent.com/kimberlyhou/mongodb-ycsb-charts/master/images/options_screenshot.png)
+   
+After executing all workload files, the program prints out a dictionary of the data with settings and the exact numeric throughputs organized by thread group:
+![Logged Output](https://raw.githubusercontent.com/kimberlyhou/mongodb-ycsb-charts/master/images/stdout_screenshot.png)
+   
+The resulting bubble chart:
+![Bubble Chart](https://raw.githubusercontent.com/kimberlyhou/mongodb-ycsb-charts/master/images/bubble_chart.png)
 
+The record count and operation count are two of the biggest indicators for how long a run would take. With 1 million each, this trial took 36 minutes to run. If they were in the low thousands, it would take less than 1 minute. See the next section for more details.
 
 ## What needs work
 The following known issues exist: 
@@ -23,7 +31,7 @@ Keep in mind YCSB has to load and run all the different workload ratios for all 
 
 Second, if the max execution time is too low or YCSB encounters a one-off problem with loading / running a workload file, this program isn't robust enough to handle such situations, resulting in a hang. Exiting the program after a set timeout limit is reached or restarting a failed command based on the error would help. 
 
-Third, depending on how the bubbe chart comes out, the legend may need to be repositioned in order to see all the bubbles. If the entire program runs and the bubble chart comes out like this (even after enlarging the window), a workaround for the current version of the script is to take the final dictionary of data printed to stdout after all the executions and then feed it into the create_bubble_chart function, running only that function after tweaking the legend position parameters. Probably the best solution is to shrink the entire graph and move the legend outside the plot without having the window cut it off.
+Third, depending on how the bubble chart comes out, the legend may need to be repositioned in order to see all the bubbles. If the entire program runs and the bubble chart comes out partially blocked by the legend (even after enlarging the window), a workaround for the current version of the script is to take the final dictionary of data printed to stdout after all the executions and then feed it into the create_bubble_chart function, running only that function after tweaking the legend position parameters. Probably the best solution is to shrink the entire graph and move the legend outside the plot without having the window cut it off.
 
 ## Further information
 This repo is based on the 10gen/MongoDB maintained partial YCSB repo with a few additional files, mainly create_chart.py and collect_settings.py. The files here should be mergable with the original project if necessary.  These files can be built and run standalone, but only MongoDB client and core YCSB libraries are provided.

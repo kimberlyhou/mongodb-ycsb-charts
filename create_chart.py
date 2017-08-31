@@ -140,14 +140,13 @@ def create_bubble_chart(dictionary):
 
     axes.set_xlabel("# threads")
     axes.set_ylabel("Throughput (ops / sec)")
-    plt.legend(loc='center left', bbox_to_anchor=(0.25, 0.75))
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.05), fancybox=True, shadow=True)
     plt.show()
 
 if __name__ == "__main__":
-    #data = open_gui()
-    #print 'executing workload files...'
-    #load_and_run(data)
-    #print data
-    #print 'finished loading / running workload files'
-    data = {'workload_files': [['fc20fl10rc1000000-r95u5s0i0-t8', 'fc20fl10rc1000000-r50u50s0i0-t8'], ['fc20fl10rc1000000-r95u5s0i0-t16', 'fc20fl10rc1000000-r50u50s0i0-t16']], 'throughputs': {'3.4.7': {'wiredTiger': {'8': [12384.667781286767, 7670.476336580502], '16': [12424.984158145198, 7088.377895602371]}, 'mmapv1': {'8': [11374.105710938478, 4916.71091706492], '16': [10322.474090590033, 4461.119116341525]}}, '3.5.10': {'wiredTiger': {'8': [11287.191295318073, 6843.268618823095], '16': [11101.859561476547, 7489.6268667894965]}, 'mmapv1': {'8': [11427.134874472924, 5508.64030231418], '16': [12040.794210786144, 5676.270917058329]}}}, 'workload_ratios': [{'read': 0.95, 'insert': 0.0, 'update': 0.05, 'scan': 0.0}, {'read': 0.5, 'insert': 0.0, 'update': 0.5, 'scan': 0.0}], 'storage_engines': ['mmapv1', 'wiredTiger'], 'workload_ranges': [90, 0, 90, 0], 'mongod_se': ['3.4.7 mmapv1', '3.4.7 wiredTiger', '3.5.10 mmapv1', '3.5.10 wiredTiger'], 'threads': ['8', '16'], 'workload_labels': ['RUSI: 0.95-0.05-0.0-0.0', 'RUSI: 0.5-0.5-0.0-0.0', 'RUSI: 0.95-0.05-0.0-0.0', 'RUSI: 0.5-0.5-0.0-0.0'], 'mongod_versions': ['3.4.7', '3.5.10']}
+    data = open_gui()
+    print 'executing workload files...'
+    load_and_run(data)
+    print data
+    print 'finished loading / running workload files'
     create_bubble_chart(data)
